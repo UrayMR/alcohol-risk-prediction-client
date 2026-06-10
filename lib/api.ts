@@ -23,8 +23,10 @@ export interface PredictResponse {
   };
 }
 
-export async function predictCBR(input: PredictInput): Promise<PredictResponse> {
-  const res = await fetch(`${BASE_URL}/cbr/predict`, {
+export async function predictCBR(
+  input: PredictInput,
+): Promise<PredictResponse> {
+  const res = await fetch(`${BASE_URL}/predict`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
