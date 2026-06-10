@@ -1,26 +1,6 @@
-interface Scores {
-  Normal: number;
-  Waspada: number;
-  Bahaya: number;
-}
+"use client";
 
-interface RSTConfidence {
-  region: string;
-  probabilities: Scores;
-  discretized_input: Record<string, string>;
-}
-
-interface DetailScores {
-  final_scores: Scores;
-  rst_confidence: RSTConfidence;
-  cbr_similarity: Scores;
-}
-
-interface ResponseData {
-  prediction: string;
-  confidence_percentage: number;
-  detail_scores: DetailScores;
-}
+import { Scores, ResponseData } from "@/lib/api";
 
 interface Props {
   data: ResponseData;
@@ -61,7 +41,10 @@ function Section({
   dim?: boolean;
 }) {
   const entries = Object.entries(scores || {});
-  const top = entries.sort((a, b) => b[1] - a[1])[0][0];
+
+  // Ambil keputusan dengan skor tertinggi untuk label status di samping title
+  const top =
+    entries.length > 0 ? entries.sort((a, b) => b[1] - a[1])[0][0] : "";
 
   return (
     <div
@@ -71,7 +54,7 @@ function Section({
         <p className="text-[10px] tracking-widest uppercase text-linen/40">
           {title}
         </p>
-        {!dim && entries.length > 0 && (
+        {!dim && top && (
           <span className={`text-xs font-bold ${labelColor[top]}`}>{top}</span>
         )}
       </div>
@@ -85,9 +68,11 @@ function Section({
 
 export default function ResultCard({ data }: Props) {
   const { prediction, confidence_percentage, detail_scores } = data;
-  const cbrScores = detail_scores.cbr_similarity;
-  const rstScores = detail_scores.rst_confidence.probabilities;
-  const finalScores = detail_scores.final_scores;
+
+  // Mengambil data skor dari mapping api.ts yang sudah bersih
+  const cbrScores = detail_scores?.cbr_similarity;
+  const rstScores = detail_scores?.rst_confidence?.probabilities;
+  const finalScores = detail_scores?.final_scores;
 
   return (
     <div className="space-y-8">
